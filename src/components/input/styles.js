@@ -3,7 +3,13 @@ import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    marginBottom: 25,
+    marginBottom: 20,
+  },
+  label: {
+    marginBottom: 8,
+    color: colors.blue,
+    fontSize: 14,
+    fontWeight: '500',
   },
   inputContainer: {
     borderWidth: 1,
@@ -11,22 +17,15 @@ export const styles = StyleSheet.create({
     borderRadius: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
   input: {
     paddingHorizontal: 16,
     paddingVertical: 20,
-    //flex:1
+    flex: 1,
   },
-  lable: {
-    marginBottom: 8,
-    color: colors.blue,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  image: {
+  eye: {
+    width: 24,
+    height: 24,
     marginHorizontal: 16,
-    width: 20,
-    height: 20,
   },
 });
