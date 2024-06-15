@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   line: {
-    height: 1,
+    heigßht: 1,
     backgroundColor: colors.lightGrey,
     flex: 1,
   },

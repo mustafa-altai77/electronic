@@ -1,41 +1,51 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
+import {FlatList, View} from 'react-native';
 import {styles} from './styles';
-import {View, ScrollView, FlatList} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Header from '../../../components/Header';
 import {categories} from '../../../data/categories';
-import {products} from '../../../data/products';
 import CategoryBox from '../../../components/CategoryBox';
 import ProductHomeItem from '../../../components/ProductHomeItem';
+import {getServices} from '../../../utils/backendCalls';
+import {ServicesContext} from '../../../../App';
+
 const Home = ({navigation}) => {
   const [selectedCategory, setSelectedCategory] = useState();
-  const [filteredProduct, setFilteredProduct] = useState(products);
   const [keyword, setKeyword] = useState();
-  console.log('keyword', keyword);
+  const [filteredProducts, setFilteredProducts] = useState(services);
+  const {services, setServices} = useContext(ServicesContext);
+
+  useEffect(() => {
+    (async () => {
+      const data = await getServices();
+      setServices(data);
+    })();
+  }, []);
 
   useEffect(() => {
     if (selectedCategory && !keyword) {
-      const updateProducts = products.filter(
-        product => product?.category === selectedCategory,
+      const updatedProducts = services?.filter(
+        product => String(product?.category) === String(selectedCategory),
       );
-      setFilteredProduct(updateProducts);
+      setFilteredProducts(updatedProducts);
     } else if (selectedCategory && keyword) {
-      const updateProducts = products.filter(
+      const updatedProducts = services?.filter(
         product =>
-          product?.category === selectedCategory &&
+          String(product?.category) === String(selectedCategory) &&
           product?.title?.toLowerCase().includes(keyword?.toLowerCase()),
       );
-      setFilteredProduct(updateProducts);
+      setFilteredProducts(updatedProducts);
     } else if (!selectedCategory && keyword) {
-      const updateProducts = products.filter(product =>
+      const updatedProducts = services?.filter(product =>
         product?.title?.toLowerCase().includes(keyword?.toLowerCase()),
       );
-      setFilteredProduct(updateProducts);
+      setFilteredProducts(updatedProducts);
     } else if (!keyword && !selectedCategory) {
-      setFilteredProduct(products);
+      setFilteredProducts(services);
     }
-  }, [selectedCategory, keyword]);
-  const reanderCategoryItem = ({item, index}) => {
+  }, [selectedCategory, keyword, services]);
+
+  const renderCategoryItem = ({item, index}) => {
     return (
       <CategoryBox
         onPress={() => setSelectedCategory(item?.id)}
@@ -46,19 +56,22 @@ const Home = ({navigation}) => {
       />
     );
   };
-  const reanderProductsItem = ({item}) => {
+
+  const renderProductItem = ({item}) => {
     const onProductPress = product => {
       navigation.navigate('ProductDetails', {product});
     };
-    return <ProductHomeItem {...item} onPress={() => onProductPress(item)} />;
+
+    return <ProductHomeItem onPress={() => onProductPress(item)} {...item} />;
   };
+
   return (
     <SafeAreaView>
       <Header
+        showSearch
         onSearch={setKeyword}
         keyword={keyword}
-        showSearch
-        title={'Find All You Need'}
+        title="Find All You Need"
       />
 
       <FlatList
@@ -66,18 +79,20 @@ const Home = ({navigation}) => {
         style={styles.list}
         horizontal
         data={categories}
-        renderItem={reanderCategoryItem}
-        keyExtractor={item => String(item.id)}
+        renderItem={renderCategoryItem}
+        keyExtractor={(item, index) => String(index)}
       />
+
       <FlatList
         style={styles.productsList}
         numColumns={2}
-        data={filteredProduct}
-        renderItem={reanderProductsItem}
-        keyExtractor={(item, index) => String(index)}
-        ListFooterComponent={<View style={{height: 100}} />}
+        data={filteredProducts}
+        renderItem={renderProductItem}
+        keyExtractor={item => String(item._id)}
+        ListFooterComponent={<View style={{height: 200}} />}
       />
     </SafeAreaView>
   );
 };
+
 export default React.memo(Home);
